@@ -1,4 +1,4 @@
-
+// server.js (FINAL COMPLETE CODE: All Features + Email Invoice)
 
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
@@ -7,9 +7,9 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const nodemailer = require('nodemailer'); 
+const nodemailer = require('nodemailer'); // NEW: Nodemailer Import
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 app.use(express.json());
 app.use(session({
@@ -19,68 +19,13 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hours
 }));
 
-// --- 📧 EMAIL CONFIGURATION ---
+// --- 📧 EMAIL CONFIGURATION (Apna Email Yahan Dalein) ---
 const transporter = nodemailer.createTransport({
   service: 'gmail', 
   auth: {
-    user: 'ujjwalchaurasia2004@gmail.com', // ✅ Sahi hai
-    pass: 'aege tydk wjyl vrcb'      // ✅ Naya App Password
+    user: 'ujjwalchaurasia2004@gmail.com', 
+    pass: 'aege tydk wjyl vrcb'     
   }
-});
-
-// ✅ IS PURE BLOCK KO REPLACE KAREIN (Async aur Fixed From Address ke saath)
-app.put('/api/bookings/mark-paid/:id', isAuthenticated, async (req, res) => {
-  const id = req.params.id;
-  
-  const sql = `
-    UPDATE bookings 
-    SET isPaid = 1, status = 'Completed' 
-    WHERE id = ? AND (status = 'Completed' OR status = 'Ready for Payment') AND isPaid = 0
-  `; 
-  
-  db.run(sql, [id], function (dbErr) {
-    if (dbErr) return res.status(500).json({ error: dbErr.message });
-    if (this.changes === 0) {
-        return res.status(400).json({ error: 'Booking not found or already paid.' });
-    }
-
-    // Nayi Details fetch karna zaroori hai email bhejane ke liye
-    db.get("SELECT * FROM bookings WHERE id = ?", [id], async (err, booking) => {
-        if(err || !booking) return res.json({ message: 'Paid! (Details fetch failed)' });
-        
-        if (booking.customerEmail) {
-            try {
-                // 1. PDF Invoice Generate karein
-                const pdfBuffer = await generateInvoicePDF(booking);
-
-                // 2. Email Options (Apna ujjwal wala email hi use karein)
-                const mailOptions = {
-                    from: '"WashAdmin Car Spa" <ujjwalchaurasia2004@gmail.com>', 
-                    to: booking.customerEmail,
-                    subject: `Payment Receipt - Booking #${booking.id}`,
-                    html: `<h2>Payment Received!</h2><p>Dear ${booking.customerName}, thank you for choosing WashAdmin. Your invoice is attached.</p>`,
-                    attachments: [{ filename: `Invoice_${booking.id}.pdf`, content: pdfBuffer }]
-                };
-
-                // 3. Email Bhejein
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.error('Email Error:', error);
-                        return res.json({ message: 'Paid! (Email failed)' }); 
-                    }
-                    console.log('Invoice Sent: ' + info.response);
-                    res.json({ message: 'Success! Invoice emailed.' });
-                });
-
-            } catch (pdfError) {
-                console.error('PDF Error:', pdfError);
-                res.json({ message: 'Paid! (PDF failed)' });
-            }
-        } else {
-            res.json({ message: 'Paid! (No email found for this customer)' });
-        }
-    });
-  });
 });
 
 // --- Middleware Functions ---
@@ -114,12 +59,12 @@ function isAdmin(req, res, next) {
 }
 
 // --- Database Connection and Setup ---
-const dbPath = path.resolve(__dirname, 'database.db'); 
-const db = new sqlite3.Database(dbPath, (err) => {
+const db = new sqlite3.Database('./database.db', (err) => {
   if (err) {
     console.error('Error opening database', err.message);
   } else {
-    console.log('Connected to the SQLite database at:', dbPath);
+    console.log('Connected to the SQLite database.');
+    
     // 1. Users Table
     db.run(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -476,7 +421,7 @@ app.post('/api/public-bookings', (req, res) => {
 // Get Customer Bookings
 app.get('/api/customer-bookings', isAuthenticated, (req, res) => {
   if (req.session.role !== 'user') return res.status(403).json({ error: 'Access denied.' });
-  db.all(`SELECT * FROM bookings WHERE customerUserId = ? ORDER BY id DESC`, [req.session.userId], (err, rows) => {
+  db.all(`SELECT * FROM bookings WHERE customerUserId = ? ORDER BY bookingDate DESC`, [req.session.userId], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
