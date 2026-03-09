@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WashAdmin - Car Wash Management</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+<body class="dashboard-page-body">
+    <div class="grid-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-car-wash logo-icon"></i>
+                <span class="logo-text">WashAdmin</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item active">
+                    <a href="#" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="bookings"><i class="fas fa-calendar-check"></i><span>Manage Bookings</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="services"><i class="fas fa-concierge-bell"></i><span>Manage Services</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="customers"><i class="fas fa-users"></i><span>Customer Data</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="reports"><i class="fas fa-chart-line"></i><span>Reports & Export</span></a>
+                </li>
+                <li class="nav-item" id="adminUsersTab"> 
+                    <a href="#" data-page="users"><i class="fas fa-user-cog"></i><span>Manage Users (Admin)</span></a>
+                </li>
+                 <li class="nav-item">
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Welcome back!</h2>
+                <div class="top-bar-actions">
+                    <button class="btn btn-primary" id="addBookingBtn"><i class="fas fa-plus"></i> Add Booking</button>
+                    <div class="user-profile">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                
+                <section id="dashboard" class="page active">
+                    <h3>Dashboard Overview</h3>
+                    <div class="stat-cards">
+                        <div class="card">
+                            <div class="card-icon"><i class="fas fa-car"></i></div>
+                            <div class="card-info">
+                                <h4>Total Bookings</h4>
+                                <p id="dashboardTotalBookings">0</p> </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="card-info">
+                                <h4>Total Revenue (Paid)</h4> <p id="dashboardTotalRevenue">₹0</p> </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon"><i class="fas fa-clock"></i></div>
+                            <div class="card-info">
+                                <h4>Pending Bookings</h4>
+                                <p id="pendingBookingsCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 1.5rem; padding: 1.5rem; flex-direction: column; align-items: flex-start;">
+                        <h4>Quick Actions</h4>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <button class="btn btn-warning" onclick="document.querySelector('a[data-page=\'bookings\']').click()"><i class="fas fa-search"></i> View Bookings</button>
+                            <button class="btn btn-success" onclick="document.querySelector('a[data-page=\'services\']').click()"><i class="fas fa-tools"></i> Manage Services</button>
+                        </div>
+                    </div>
+                    </section>
+
+                <section id="bookings" class="page">
+                    <h3>Manage Bookings</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th> 
+                                    <th>Vehicle Details</th>
+                                    <th>Service</th>
+                                    <th>Status</th>
+                                    <th>Price</th>
+                                    <th>Payment Status</th>
+                                    <th>Booking Date</th> 
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="services" class="page">
+                    <h3>Manage Services</h3>
+                    <div class="service-content-wrapper">
+                        <div class="form-container card" id="addServiceCard"> 
+                            <h4>Add New Service</h4>
+                            <form id="addServiceForm">
+                                <div class="form-group">
+                                    <label for="serviceName">Service Name:</label>
+                                    <input type="text" id="serviceName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="servicePrice">Service Price (₹):</label>
+                                    <input type="number" id="servicePrice" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Service</button>
+                            </form>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Service Name</th>
+                                        <th>Price</th>
+                                        <th id="serviceActionsHeader">Actions</th>
+                                    </tr>
+                               </thead>
+                                <tbody id="servicesTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="customers" class="page">
+                    <h3>Customer Data</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Total Visits</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="reports" class="page">
+                    <h3>Reports & Export</h3>
+                    <div class="stat-cards">
+                        <div class="card">
+                            <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="card-info">
+                                <h4>Total Revenue (Paid & Completed)</h4> <p id="reportTotalRevenue">₹0</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon"><i class="fas fa-car"></i></div>
+                            <div class="card-info">
+                                <h4>Total Bookings</h4>
+                                <p id="reportTotalBookings">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group card" style="text-align: center; width: 250px; margin: 10px auto;">
+                        <label for="reportPeriodSelect" style="font-weight: 400; font-size: 0.9em; display:block;">Group Trends By:</label>
+                        <select id="reportPeriodSelect" style="padding: 0.5rem;">
+                            <option value="daily">Daily (Last 7 Days)</option>
+                            <option value="weekly">Weekly (Last 8 Weeks)</option>
+                            <option value="monthly">Monthly (Last 12 Months)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                        
+                        <div class="chart-container card" id="revenueTrendChartContainer" style="height: 350px;">
+                            <h4 style="margin-bottom: 0;">Revenue Trend (₹)</h4>
+                            <canvas id="revenueTrendChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                        
+                        <div class="chart-container card" id="bookingsTrendChartContainer" style="height: 350px;">
+                            <h4 style="margin-bottom: 0;">Bookings Count Trend</h4>
+                            <canvas id="bookingsTrendChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container card" style="margin-top: 1.5rem; height: 350px;">
+                        <h4>Service Popularity (Overall)</h4>
+                        <canvas id="servicePopularityChart" style="max-height: 250px;"></canvas>
+                    </div>
+
+                    <div class="card" style="margin-top: 1.5rem; padding: 1.5rem; flex-direction: column; align-items: flex-start;">
+                        <h4>Export Data</h4>
+                        <p style="font-size: 0.9rem; color: var(--grey-color);">
+                            Use the Invoice button in the Bookings tab to export individual PDF invoices for Paid bookings.
+                        </p>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <button class="btn btn-success" id="exportSummaryReportBtn">
+                                <i class="fas fa-file-excel"></i> Export Summary Report (CSV)
+                            </button>
+                            
+                        </div>
+                    </div>
+                </section>
+
+                <section id="users" class="page">
+                    <h3>Manage System Users (Admin Only)</h3>
+                    
+                    <div class="table-container card" style="margin-bottom: 20px;">
+                        <h4>Existing System Users (Admin/Employee)</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-container card" style="max-width: 500px; margin: 0 auto;">
+                        <h4>Create New System User (Admin/Employee)</h4>
+                        <form id="addUserForm">
+                            <div class="form-group">
+                                <label for="newUsername">Username:</label>
+                                <input type="text" id="newUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Password:</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userRole">Role:</label>
+                                <select id="userRole">
+                                    <option value="employee">Employee</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                            <p id="userMessage" style="margin-top: 10px;"></p>
+                        </form>
+                    </div>
+                </section>
+                </div>
+        </main>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modalTitle">Booking Details</h3>
+            <form id="bookingForm">
+                <input type="hidden" id="bookingId" value="">
+                <input type="hidden" id="isPaidInput" value="0">
+                <div class="form-group">
+                    <label for="customerName">Customer Name:</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Customer Phone:</label>
+                    <input type="tel" id="customerPhone" pattern="[0-9]{10}" title="Please enter a 10-digit phone number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vehicleType">Vehicle Type:</label>
+                    <select id="vehicleType" required>
+                        <option value="">-- Select Type --</option>
+                       <option value="Sedan">Sedan</option>
+                        <option value="Hatchback">Hatchback</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Motorcycle">Motorcycle</option>
+                        <option value="Van">Van</option>
+                        <option value="Truck">Truck</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleNumber">Vehicle Number (License Plate):</label>
+                    <input type="text" id="vehicleNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleModel">Vehicle Model:</label>
+                    <input type="text" id="vehicleModel" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serviceType">Service Type:</label>
+                    <input type="text" id="serviceType" list="serviceList" required>
+                    <datalist id="serviceList">
+                        </datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Ready for Payment">Ready for Payment</option> 
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" id="saveBookingBtn">Save Booking</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="userEditModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn user-close-btn">&times;</span>
+            <h3>Edit User: <span id="editUsernameDisplay"></span></h3>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" value="">
+
+                <div class="form-group">
+                    <label for="editUsername">Username:</label>
+                    <input type="text" id="editUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserRole">Role:</label>
+                    <select id="editUserRole">
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <hr style="margin: 15px 0;">
+                <div class="form-group">
+                    <label for="newPass">New Password (Optional to change):</label>
+                    <input type="password" id="newPass" placeholder="Enter new password to change">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="saveUserEditBtn">Save Changes</button>
+                <p id="editUserMessage" style="margin-top: 10px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

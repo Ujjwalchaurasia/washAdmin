@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WashAdmin - Staff Login</title>
+    <link rel="stylesheet" href="landing/landingstyle.css"> 
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <style>
+        /* FIX: Ensure the body display properties are present to center the container */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .login-container h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+        .login-container .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        /* Button styles from style.css */
+        .login-container .btn-primary {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        #loginMessage {
+            margin-top: 1rem;
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+        .link-text {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .link-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>WashAdmin Staff/Admin Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <p id="loginMessage"></p>
+            <button type="submit" class="btn btn-primary">Login</button>
+            
+            <p class="link-text"><a href="/">Back to Welcome Page</a></p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('loginMessage');
+            messageEl.textContent = ''; 
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageEl.style.color = 'var(--secondary-color)'; // Assuming secondary-color is success
+                    messageEl.textContent = 'Login Successful! Redirecting...';
+                    
+                    // Redirect to root. Server will handle if it's Admin/Employee or User.
+                    window.location.href = '/'; 
+                } else {
+                    messageEl.style.color = 'var(--danger-color)';
+                    messageEl.textContent = data.error || 'Invalid username or password.';
+                }
+            } catch (error) {
+                messageEl.style.color = 'var(--danger-color)';
+                messageEl.textContent = 'Network error. Could not connect to the server.';
+                console.error('Login error:', error);
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/checkAuth');
+                const authStatus = await response.json();
+                if (authStatus.isAuthenticated) {
+                    // If already logged in, go to the root
+                    window.location.href = '/'; 
+                }
+            } catch (error) {
+                console.error('Auth check failed on login page:', error);
+            }
+            
+            const lastUser = localStorage.getItem('lastLoggedInUser');
+            const usernameInput = document.getElementById('username');
+            if (lastUser && usernameInput) {
+                usernameInput.value = lastUser;
+                usernameInput.focus(); 
+                document.getElementById('password').value = '';
+                localStorage.removeItem('lastLoggedInUser'); 
+            }
+        });
+
+    </script>
+</body>
+</html>
