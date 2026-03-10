@@ -19,13 +19,18 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hours
 }));
 
-// --- 📧 EMAIL CONFIGURATION (Apna Email Yahan Dalein) ---
+// --- 📧 EMAIL CONFIGURATION  ---
 const transporter = nodemailer.createTransport({
-  service: 'gmail', 
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: 'ujjwalchaurasia2004@gmail.com', 
-    pass: 'aege tydk wjyl vrcb'     
-  }
+    user: "ujjwalchaurasia2004@gmail.com",
+    pass: "aege tydk wjyl vrcb"
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 // --- Middleware Functions ---
@@ -389,7 +394,7 @@ app.delete('/api/users/:id', isAuthenticated, isAdmin, (req, res) => {
 });
 
 
-// --- PUBLIC BOOKING (UPDATED: Now Accepts Email) ---
+// --- PUBLIC BOOKING ---
 app.post('/api/public-bookings', (req, res) => {
   const { customerName, customerPhone, customerEmail, vehicleType, vehicleNumber, vehicleModel, service } = req.body;
   const customerUserId = req.session.role === 'user' ? req.session.userId : null;
@@ -468,7 +473,7 @@ app.put('/api/bookings/mark-paid/:id', isAuthenticated, (req, res) => {
 
                 // 4. Configure Email
                 const mailOptions = {
-                    from: '"WashAdmin" <your-email@gmail.com>', // 🔴 Check your config at top
+                    from: '"WashAdmin Car Spa" <ujjwalchaurasia2004@gmail.com>', 
                     to: booking.customerEmail,
                     subject: `Payment Receipt - Booking #${booking.id}`,
                     html: `
@@ -626,5 +631,5 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
